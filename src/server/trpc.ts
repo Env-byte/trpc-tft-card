@@ -7,42 +7,14 @@
  * @see https://trpc.io/docs/v10/router
  * @see https://trpc.io/docs/v10/procedures
  */
-
 import { initTRPC } from '@trpc/server';
-import { transformer } from '~/utils/transformer';
-import { Context } from './context';
 
-const t = initTRPC.context<Context>().create({
-  /**
-   * @see https://trpc.io/docs/v10/data-transformers
-   */
-  transformer,
-  /**
-   * @see https://trpc.io/docs/v10/error-formatting
-   */
-  errorFormatter({ shape }) {
-    return shape;
-  },
-});
+const t = initTRPC.create();
 
 /**
- * Create a router
- * @see https://trpc.io/docs/v10/router
- */
-export const router = t.router;
-
-/**
- * Create an unprotected procedure
- * @see https://trpc.io/docs/v10/procedures
+ * Unprotected procedure
  **/
 export const publicProcedure = t.procedure;
 
-/**
- * @see https://trpc.io/docs/v10/middlewares
- */
+export const router = t.router;
 export const middleware = t.middleware;
-
-/**
- * @see https://trpc.io/docs/v10/merging-routers
- */
-export const mergeRouters = t.mergeRouters;

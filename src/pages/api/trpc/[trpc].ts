@@ -1,35 +1,39 @@
 /**
- * This file contains tRPC's HTTP response handler
+ * This is the API-handler of your app that contains all your API routes.
+ * On a bigger app, you will probably want to split this file up into multiple files.
  */
-import * as trpcNext from '@trpc/server/adapters/next';
-import { createContext } from '~/server/context';
-import { appRouter } from '~/server/routers/_app';
+import {createNextApiHandler} from '@trpc/server/adapters/next';
+import {z} from 'zod';
+import {publicProcedure, router} from '~/server/trpc';
+import {summonerHandler} from "~/server/handler";
 
-export default trpcNext.createNextApiHandler({
-  router: appRouter,
-  /**
-   * @link https://trpc.io/docs/context
-   */
-  createContext,
-  /**
-   * @link https://trpc.io/docs/error-handling
-   */
-  onError({ error }) {
-    if (error.code === 'INTERNAL_SERVER_ERROR') {
-      // send to bug reporting
-      console.error('Something went wrong', error);
-    }
-  },
-  /**
-   * Enable query batching
-   */
-  batching: {
-    enabled: true,
-  },
-  /**
-   * @link https://trpc.io/docs/caching#api-response-caching
-   */
-  // responseMeta() {
-  //   // ...
-  // },
+const appRouter = router({
+    greeting: publicProcedure
+        // This is the input schema of your procedure
+        // 💡 Tip: Try changing this and see type errors on the client straight away
+        .input(
+            z.object({
+                name: z.string().nullish(),
+            }),
+        )
+        .query(({input}) => {
+            // This is what you're returning to your client
+            return {
+                text: `hello ${input?.name ?? 'world'}`,
+                // 💡 Tip: Try adding a new property here and see it propagate to the client straight-away
+            };
+        }),
+    summoner: publicProcedure.input(z.object({name: z.string()})).query(({input}) => {
+        return summonerHandler({name: input.name})
+    })
+});
+
+// export only the type definition of the API
+// None of the actual implementation is exposed to the client
+export type AppRouter = typeof appRouter;
+
+// export API handler
+export default createNextApiHandler({
+    router: appRouter,
+    createContext: () => ({}),
 });
