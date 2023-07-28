@@ -4,10 +4,8 @@
  */
 import {createNextApiHandler} from '@trpc/server/adapters/next';
 import {z} from 'zod';
-import {redis} from "~/server/cache";
 import {publicProcedure, router} from '~/server/trpc';
 import {summonerHandler} from "~/server/handler";
-
 
 const appRouter = router({
     summoner: publicProcedure

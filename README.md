@@ -1,20 +1,35 @@
-# Next.js + tRPC
+# Setup
 
-This example shows how you can make a typed query using a minimal implementation of tRPC following [`this as a reference`](https://trpc.io/docs/client/nextjs).
-
-## Setup
+1. Install docker
+2. Install depenedencies
 
 ```bash
-npx create-next-app --example https://github.com/trpc/trpc --example-path examples/next-minimal-starter trpc-minimal-starter
-cd trpc-minimal-starter
 npm i
-npm run dev
 ```
 
-## Development
+# Development
 
-### Start project
+## Start project
+
+1. Create a .env file like this:
+
+```dotenv
+RIOT_API_KEY=<RIOT API KEY>
+
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/tft?schema=public"
+
+REDIS_PORT=6379
+REDIS_HOST=localhost
+
+```
+
+2. Start up docker
+3. Then run the below commands
 
 ```bash
-npm run dev        # starts next.js
+npm run docker:start # starts postgres and redis
+```
+
+```bash
+npm run dev # starts next.js
 ```
