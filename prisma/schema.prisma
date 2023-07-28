@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Summoner {
+  summonerId    Int             @id @default(autoincrement()) @map("summonerid")
+  id            String          @map("id") @db.VarChar
+  accountId     String          @map("accountid") @db.VarChar
+  puuid         String          @map("puuid") @db.VarChar
+  name          String          @map("name") @db.VarChar
+  profileIconId Int             @map("profileiconid")
+  revisionDate  BigInt          @map("revisiondate") @db.BigInt
+  summonerLevel Int             @map("summonerlevel")
+  summonerAlias SummonerAlias[]
+
+  @@map("summoner")
+}
+
+model SummonerAlias {
+  name       String   @db.VarChar
+  summonerId Int      @map("summonerid")
+  summoner   Summoner @relation(fields: [summonerId], references: [summonerId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([name, summonerId])
+  @@map("summoner_alias")
+}

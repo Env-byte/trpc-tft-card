@@ -5,29 +5,28 @@ import {trpc} from '~/utils/trpc';
 import {CSSProperties} from "react";
 
 export default function IndexPage() {
-    // 💡 Tip: CMD+Click (or CTRL+Click) on `greeting` to go to the server definition
-    const result = trpc.greeting.useQuery({name: 'client'});
-    const person = trpc.summoner.useQuery({name: 'ntenvious'});
-
-    if (!result.data) {
+    const player = trpc.summoner.useQuery({name: 'ntenvious'});
+    if (!player.data) {
         return (
             <div style={styles}>
                 <h1>Loading...</h1>
             </div>
         );
     }
+    const matches = player.data.matches?.map((m) => {
+        const position = m.info.participants.find((p) => p.puuid === player.data?.summoner?.puuid)?.placement
+        return <div style={{padding: 10}}>{position}</div>
+    })
     return (
         <div style={styles}>
-            {/**
-             * The type is defined and can be autocompleted
-             * 💡 Tip: Hover over `data` to see the result type
-             * 💡 Tip: CMD+Click (or CTRL+Click) on `text` to go to the server definition
-             * 💡 Tip: Secondary click on `text` and "Rename Symbol" to rename it both on the client & server
-             */}
-            <h1>{result.data.text}</h1>
             <br/>
             <br/>
-            {person.data && <><h2>{person.data.summoner.name}</h2><p>{person.data.summoner.id}</p></>}
+            {player.data.summoner && <><h2>{player.data.summoner.name}</h2></>}
+            <p>Matches:</p>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+            }}>{matches}</div>
         </div>
     );
 }

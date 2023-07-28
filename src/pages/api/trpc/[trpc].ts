@@ -4,28 +4,17 @@
  */
 import {createNextApiHandler} from '@trpc/server/adapters/next';
 import {z} from 'zod';
+import {redis} from "~/server/cache";
 import {publicProcedure, router} from '~/server/trpc';
 import {summonerHandler} from "~/server/handler";
 
+
 const appRouter = router({
-    greeting: publicProcedure
-        // This is the input schema of your procedure
-        // 💡 Tip: Try changing this and see type errors on the client straight away
-        .input(
-            z.object({
-                name: z.string().nullish(),
-            }),
-        )
-        .query(({input}) => {
-            // This is what you're returning to your client
-            return {
-                text: `hello ${input?.name ?? 'world'}`,
-                // 💡 Tip: Try adding a new property here and see it propagate to the client straight-away
-            };
-        }),
-    summoner: publicProcedure.input(z.object({name: z.string()})).query(({input}) => {
-        return summonerHandler({name: input.name})
-    })
+    summoner: publicProcedure
+        .input(z.object({name: z.string()}))
+        .query(async ({input}) => {
+            return summonerHandler(input)
+        })
 });
 
 // export only the type definition of the API
