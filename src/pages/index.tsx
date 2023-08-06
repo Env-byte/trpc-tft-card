@@ -1,41 +1,37 @@
-/**
- * This is a Next.js page.
- */
-import {trpc} from '~/utils/trpc';
-import {CSSProperties} from "react";
+import React, {useState} from "react";
+import Form from 'react-bootstrap/Form';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import SummonerCard from "~/pages/SummonerCard/SummonerCard";
+
 
 export default function IndexPage() {
-    const player = trpc.summoner.useQuery({name: 'ntenvious'});
-    if (!player.data) {
-        return (
-            <div style={styles}>
-                <h1>Loading...</h1>
-            </div>
-        );
-    }
-    const matches = player.data.matches?.map((m) => {
-        const position = m.info.participants.find((p) => p.puuid === player.data?.summoner?.puuid)?.placement
-        return <div style={{padding: 10}}>{position}</div>
-    })
+    const [summonerName, setSummonerName] = useState<string>();
     return (
-        <div style={styles}>
+        <Container>
+            <Row>
+                <Col>
+                    <Form.Label htmlFor="summonerName">Summoner</Form.Label>
+                    <Form.Control
+                        type="text"
+                        id="summonerName"
+                        aria-describedby="Summoner Name"
+                        onBlur={(e) => {
+                            setSummonerName(e.target.value);
+                        }}
+                    />
+                    <Form.Text id="passwordHelpBlock" muted>
+                        Enter your summoner name.
+                    </Form.Text>
+                </Col>
+            </Row>
             <br/>
-            <br/>
-            {player.data.summoner && <><h2>{player.data.summoner.name}</h2></>}
-            <p>Matches:</p>
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-            }}>{matches}</div>
-        </div>
+            <Row>
+                <Col xs={{span: 12, offset: 0}} md={{span: 6, offset: 3}}>
+                    <SummonerCard summonerName={summonerName}/>
+                </Col>
+            </Row>
+        </Container>
     );
 }
-
-const styles: CSSProperties = {
-    width: '100vw',
-    height: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column'
-};

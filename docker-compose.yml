@@ -11,8 +11,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql
-      - ./db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+      - ./docker/db:/var/lib/postgresql
+      - ./prisma/migrations/0_init/migration.sql:/docker-entrypoint-initdb.d/setup.sql
   cache:
     image: redis:6.2-alpine
     restart: always
@@ -20,7 +20,7 @@ services:
       - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning
     volumes:
-      - cache:/data
+      - ./docker/cache:/data
 volumes:
   cache:
     driver: local

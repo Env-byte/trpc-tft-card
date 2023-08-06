@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as process from "process";
 
 const endpoint = {
     region: 'europe.api.riotgames.com',
@@ -87,6 +88,35 @@ export interface Unit {
     tier: number
 }
 
+type LeagueType = 'RANKED_TFT_TURBO' | 'RANKED_TFT'
+
+interface BaseLeague {
+    queueType: LeagueType
+    wins: number
+    losses: number
+    summonerId: string
+    summonerName: string
+}
+
+export interface LeagueTurbo extends BaseLeague {
+    queueType: 'RANKED_TFT_TURBO'
+    ratedTier: string
+    ratedRating: number
+}
+
+export interface LeagueRanked extends BaseLeague {
+    queueType: 'RANKED_TFT',
+    leagueId: string
+    tier: string
+    rank: string
+    leaguePoints: number
+    veteran: boolean
+    inactive: boolean
+    freshBlood: boolean
+    hotStreak: boolean
+}
+
+export type League = LeagueRanked | LeagueTurbo
 
 const proxy = {
     platform: axios.create({
@@ -98,17 +128,25 @@ const proxy = {
         headers: getHeaders()
     })
 }
+
+
 export const getSummoner = async ({name}: { name: string }): Promise<Summoner> => {
     const res = await proxy.platform.get<Summoner>(`/lol/summoner/v4/summoners/by-name/${name}`)
     return res.data
 }
 
 export const getMatchIds = async ({puuid}: { puuid: string }): Promise<string[]> => {
-    const res = await proxy.region.get<string[]>(`/tft/match/v1/matches/by-puuid/${puuid}/ids`)
+    const res = await proxy.region.get<string[]>(`/tft/match/v1/matches/by-puuid/${puuid}/ids?count=10`)
+    console.log(res)
     return res.data
 }
 
 export const getMatch = async ({matchId}: { matchId: string }): Promise<Match> => {
     const res = await proxy.region.get<Match>(`/tft/match/v1/matches/${matchId}`)
+    return res.data
+}
+
+export const getLeagues = async ({summonerId}: { summonerId: string }): Promise<League[]> => {
+    const res = await proxy.platform.get<League[]>(`/tft/league/v1/entries/by-summoner/${summonerId}`)
     return res.data
 }

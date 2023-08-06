@@ -1,5 +1,19 @@
-import * as riotapi from "~/server/riotapi";
+import * as riotapi from "~/server/lib/riotapi";
+import * as db from "~/server/lib/repository";
 import {redis} from "~/server/cache";
+
+
+export type GetSummonerProps = { name?: string, summonerId?: number }
+
+export const getSummoner = async ({name, summonerId}: GetSummonerProps) => {
+    const summoner = await db.getSummoner({name, summonerId});
+    if (!summoner && name) {
+        const summoner = await riotapi.getSummoner({name});
+        await db.insertSummoner({summoner, name});
+    }
+
+    return summoner
+}
 
 export const getMatches = async ({puuid}: { puuid: string }) => {
     const key = `matches:${puuid}`

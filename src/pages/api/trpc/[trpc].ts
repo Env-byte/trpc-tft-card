@@ -4,15 +4,19 @@
  */
 import {createNextApiHandler} from '@trpc/server/adapters/next';
 import {z} from 'zod';
-import {publicProcedure, router} from '~/server/trpc';
-import {summonerHandler} from "~/server/handler";
+import {createContext, publicProcedure, router, summonerProcedure} from '~/server/trpc';
+import {matchesHandler, summonerHandler} from "~/server/lib/handler";
 
 const appRouter = router({
     summoner: publicProcedure
         .input(z.object({name: z.string()}))
         .query(async ({input}) => {
             return summonerHandler(input)
-        })
+        }),
+    matches: summonerProcedure
+        .query(async ({ctx}) => {
+            return matchesHandler({summoner: ctx.summoner})
+        }),
 });
 
 // export only the type definition of the API
@@ -22,5 +26,5 @@ export type AppRouter = typeof appRouter;
 // export API handler
 export default createNextApiHandler({
     router: appRouter,
-    createContext: () => ({}),
+    createContext,
 });
