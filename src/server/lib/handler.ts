@@ -1,6 +1,5 @@
 import {getMatches, getSummoner} from "~/server/lib/service";
-import {Summoner} from "~/server/lib/riotapi";
-import {Match} from "~/server/lib/riotapi";
+import {Summoner, Match} from "~/server/lib/riotapi";
 import {ApiResponse, ErrorResponse, handleError} from "~/utils/api";
 
 type SummonerResponse = ApiResponse<Summoner> | ErrorResponse
